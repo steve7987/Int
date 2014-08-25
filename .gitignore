@@ -5,6 +5,9 @@ ehthumbs.db
 #Folder for testing the functions
 Test
 
+#Source for testing
+main.c
+
 # Folder config file
 Desktop.ini
 
