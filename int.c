@@ -16,7 +16,7 @@ int SaveInt(char * filename, BigInt * tosave){
 		return 1;
 	}
 	//write the sign here
-	if (fwrite(tosave->negative, sizeof(unsigned char), 1, fp) != 1){
+	if (fwrite(&(tosave->negative), sizeof(unsigned char), 1, fp) != 1){
 		printf("Failed to write file %s", filename);
 		return 1;
 	}

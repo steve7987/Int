@@ -20,7 +20,7 @@ int main(int argc, char * argv[]){
 	PrintInt(&j);
 	PrintBase10(&i);
 	PrintBase10(&j);
-	Multiply(&i, &j, &k);
+	Subtract(&i, &j, &k);
 	PrintBase10(&k);
 
 	DeleteInt(&i);
