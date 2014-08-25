@@ -89,6 +89,11 @@ void PrintInt(BigInt * printme){
 	if (printme->negative != 0){
 		printf("-");
 	}
+	
+	if (i == -1){
+		printf("0");
+	}
+	
 	for (; i >= 0; i--){
 		printf("%0*X  ", sizeof(unsigned char)*2, printme->num[i]);
 
