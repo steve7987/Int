@@ -38,6 +38,6 @@ int Multiply(BigInt * x, BigInt * y, BigInt * product);
 int Divide(BigInt * x, BigInt * y, BigInt * quotient);
 int Modulo(BigInt * x, BigInt * y, BigInt * remainder);
 
-char * ToBase10(BigInt * x);  //returns a null terminated string that contains the base 10 representation of the int
+char * ToBase10(BigInt * x);  //returns a null terminated string that contains the base 10 representation of the int or 0 in the case of an error
 void GCD(BigInt * x, BigInt * y, BigInt * gcd);  //computes the greatest common divisor of the two inputs
 

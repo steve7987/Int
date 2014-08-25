@@ -455,7 +455,7 @@ int PrintBase10(BigInt * x){
 	}
 	rlength = x->length;
 	index = 0;
-	while (Compare(&p, &zero) > 0){
+	while (Compare(&p, &zero) != 0){
 		ret[index] = '0' + ModuloS(&p, 10);
 		DivideS(&p, 10);
 		index++;
@@ -484,7 +484,7 @@ int PrintBase10(BigInt * x){
 	}
 	ret[index] = '\0';
 	DeleteInt(&p);
-	if (x->negative == 1){
+	if (x->negative != 0){
 		printf("-");
 	}
 	printf(ret);
@@ -497,8 +497,15 @@ char * ToBase10(BigInt * x){
 	char * ret;
 	int rlength;
 	int index;
-	int offset = x->negative;  //need extra char for negative number
 	BigInt p, zero;
+	int offset;
+	if (x->negative != 0){  //need extra char for negative number
+		offset = 1;
+	}
+	else {
+		offset = 0;
+	}
+
 	CopyInt(x, &p);
 	zero.length = 0;
 	ret = malloc(x->length*sizeof(char));  //can expand if necessary
@@ -508,7 +515,7 @@ char * ToBase10(BigInt * x){
 	}
 	rlength = x->length;
 	index = 0;
-	while (Compare(&p, &zero) > 0){
+	while (Compare(&p, &zero) != 0){
 		ret[index] = '0' + ModuloS(&p, 10);
 		DivideS(&p, 10);
 		index++;
@@ -527,6 +534,10 @@ char * ToBase10(BigInt * x){
 			ret = tmp;
 			rlength = 2*rlength;
 		}
+	}
+	if (offset != 0){
+		ret[index] = '-';
+		index++;
 	}
 	//reverse array
 	int i;
