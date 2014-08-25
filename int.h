@@ -3,7 +3,7 @@ typedef struct
 {
 	size_t length;  
 	unsigned char * num;
-	unsigned char negative;  //0 is positive, 1 is negative
+	unsigned char negative;  //0 is positive, non 0 is negative
 } BigInt;
 
 //in general these functions return 1 if the function failed, and 0 if it succeeded

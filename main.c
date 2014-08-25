@@ -18,11 +18,12 @@ int main(int argc, char * argv[]){
 	
 	PrintInt(&i);
 	PrintInt(&j);
-	PrintBase10(&i);
-	PrintBase10(&j);
+	//PrintBase10(&i);
+	//PrintBase10(&j);
 	Subtract(&i, &j, &k);
-	PrintBase10(&k);
-
+	//PrintBase10(&k);
+	PrintInt(&k);
+	
 	DeleteInt(&i);
 	DeleteInt(&j);
 	DeleteInt(&k);

@@ -86,7 +86,7 @@ void DeleteInt(BigInt * deleteme){
 void PrintInt(BigInt * printme){
 	int i = printme->length - 1;
 	while (printme->num[i] == 0) i--;
-	if (printme->negative == 1){
+	if (printme->negative != 0){
 		printf("-");
 	}
 	for (; i >= 0; i--){
@@ -111,19 +111,57 @@ double Approximate(BigInt * x){
 }
 
 int Compare(BigInt * x, BigInt * y){
-	int i;
+	int i, flag;  //flag flips return result if both numbers are negative
+	//check if number are different signs
+	if (x->negative == 0 && y->negative != 0){
+		//check if x is zero
+		for (i = 0; i < x->length; i++){
+			if (x->num[i] != 0){
+				return 1;
+			}
+		}
+		//check if y is zero
+		for (i = 0; i < y->length; i++){
+			if (y->num[i] != 0){
+				return -1;
+			}
+		}
+		return 0;
+	}
+	else if (x->negative != 0 && y->negative == 0){
+		//check if x is zero
+		for (i = 0; i < x->length; i++){
+			if (x->num[i] != 0){
+				return -1;
+			}
+		}
+		//check if y is zero
+		for (i = 0; i < y->length; i++){
+			if (y->num[i] != 0){
+				return 1;
+			}
+		}
+		return 0;
+	}
+	else if (x->negative == 0){
+		//both positive
+		flag = 1;
+	}
+	else {
+		flag = -1;
+	}
 	if (x->length > y->length){
 		//check if anything is non zero
 		for (i = x->length - 1; i >= (int) y->length; i--){
 			if(x->num[i] != 0){
-				return 1;
+				return 1 * flag;
 			}
 		}
 	}
 	else if (x->length < y->length){
 		//check if anything is non zero
 		for (i = y->length - 1; i >= x->length; i--){
-			if(y->num[i] != 0) return -1;
+			if(y->num[i] != 0) return -1 * flag;
 		}
 	}
 	else {
@@ -131,8 +169,8 @@ int Compare(BigInt * x, BigInt * y){
 	}
 	for (; i >= 0; i--){
 		
-		if (x->num[i] > y->num[i]) return 1;
-		if (x->num[i] < y->num[i]) return -1;
+		if (x->num[i] > y->num[i]) return 1 * flag;
+		if (x->num[i] < y->num[i]) return -1 * flag;
 	}
 	return 0;
 }
