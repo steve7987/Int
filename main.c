@@ -9,7 +9,7 @@ int main(int argc, char * argv[]){
 	
 	BigInt i, j, k;
 	if(argc != 3){
-		//printf("Correct usage of %s is %s intfile", argv[0], argv[0]);
+		printf("Correct usage of %s is %s intfile", argv[0], argv[0]);
 		return 0;
 	}
 	if (LoadInt(argv[1], &i) || LoadInt(argv[2], &j)){

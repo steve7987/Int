@@ -3,11 +3,11 @@ typedef struct
 {
 	size_t length;  
 	unsigned char * num;
-	int negative;  //0 is positive, 1 is negative
+	unsigned char negative;  //0 is positive, 1 is negative
 } BigInt;
 
 //in general these functions return 1 if the function failed, and 0 if it succeeded
-//when saving and loading the least significant byte is stored first
+//when saving and loading sign is stored in the first byte then the least significant byte is stored first
 int LoadInt(char * filename, BigInt * result);  //loads a big int from a file into memory
 int SaveInt(char * filename, BigInt * tosave);  //saves a big int to a file
 int CopyInt(BigInt * source, BigInt * dest);  //makes a deep copy of the source

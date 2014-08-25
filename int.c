@@ -5,7 +5,7 @@
 int SaveInt(char * filename, BigInt * tosave){
 	FILE * fp = fopen(filename, "wb");
 	int length = tosave->length;
-	while(tosave->num[length - 1] == 0){
+	while(tosave->num[length - 1] == 0){  //remove leading zeros
 		length--;
 	}
 	if (length == 0){
@@ -15,7 +15,12 @@ int SaveInt(char * filename, BigInt * tosave){
 		printf("unable to open file %s", filename);
 		return 1;
 	}
-	
+	//write the sign here
+	if (fwrite(tosave->negative, sizeof(unsigned char), 1, fp) != 1){
+		printf("Failed to write file %s", filename);
+		return 1;
+	}
+	//write the rest of the number
 	if (fwrite(tosave->num, sizeof(unsigned char), length, fp) != length){
 		printf("Failed to write file %s", filename);
 		return 1;
@@ -26,23 +31,28 @@ int SaveInt(char * filename, BigInt * tosave){
 
 int LoadInt(char * filename, BigInt * result){
 	FILE * fp = fopen(filename, "rb");
-	size_t filesize;
+	size_t intlength;
 	if (!fp){
 		printf("Unable to open file %s", filename);
 		return 1;
 	}
 	fseek(fp, 0, SEEK_END);
-	filesize = ftell(fp);
+	intlength = ftell(fp) - sizeof(unsigned char);  //exclude the sign character
 	fseek(fp, 0, SEEK_SET);
-	result->num = malloc(sizeof(unsigned char) * ((filesize + sizeof(unsigned char) - 1) / sizeof(unsigned char)));
+	result->num = malloc(sizeof(unsigned char) * ((intlength + sizeof(unsigned char) - 1) / sizeof(unsigned char)));
 	if (!result->num){
 		printf("Malloc failed when loading file %s", filename);
 		return 1;
 	}
-	result->length = (filesize + sizeof(unsigned char) - 1) / sizeof(unsigned char);
+	result->length = (intlength + sizeof(unsigned char) - 1) / sizeof(unsigned char);
 	result->num[result->length - 1] = 0;
-	result->negative = 0;  //positive number
-	if (fread(result->num, 1, filesize, fp) != filesize){
+	//read sign
+	if (fread(&(result->negative), sizeof(unsigned char), 1, fp) != 1){
+		printf("Failed reading file %s", filename);
+		return 1;
+	}
+	//read digits
+	if (fread(result->num, 1, intlength, fp) != intlength){
 		printf("Failed reading file %s", filename);
 		return 1;
 	}
