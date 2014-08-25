@@ -86,7 +86,7 @@ void DeleteInt(BigInt * deleteme){
 void PrintInt(BigInt * printme){
 	int i = printme->length - 1;
 	while (printme->num[i] == 0) i--;
-	if (printme->negative != 0){
+	if (printme->negative != 0 && i != -1){
 		printf("-");
 	}
 	
