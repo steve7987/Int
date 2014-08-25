@@ -61,6 +61,28 @@ int LoadInt(char * filename, BigInt * result){
 	return 0;
 }
 
+int MakeInt(int value, BigInt * result){
+	int i;
+	result->length = sizeof(int) / sizeof(unsigned char);
+	result->num = malloc(sizeof(int));
+	if (!result->num){
+		printf("Malloc failed when making int with value %d", value);
+		return 1;
+	}
+	if (value < 0){
+		result->negative = 1;
+		value = value * -1;
+	}
+	else {
+		result->negative = 0;
+	}
+	for (i = 0; i < result->length; i++){
+		result->num[i] = (unsigned char) value;
+		value = value >> (8 * sizeof(unsigned char));
+	}
+	return 0;
+}
+
 int CopyInt(BigInt * source, BigInt * dest){
 	dest->num = malloc(source->length * sizeof(unsigned char));
 	if (!dest->num){
