@@ -131,7 +131,7 @@ double Approximate(BigInt * x){
 		ret += x->num[i] * pow;
 		pow = pow * (1 << 8*sizeof(unsigned char));
 	}
-	if (x->negative == 1){
+	if (x->negative != 0){
 		ret = ret * -1;
 	}
 	return ret;
@@ -376,7 +376,13 @@ int Multiply(BigInt * x, BigInt * y, BigInt * product){
 		product->num[i] = (unsigned char) sum;
 		carry = sum >> (8*sizeof(unsigned char));
 	}
-	product->negative = x->negative ^ y->negative;
+	//figure out the sign of the product
+	if (x->negative != 0 && y->negative != 0){
+		product->negative = 0;
+	}
+	else {
+		product->negative = x->negative ^ y->negative;
+	}
 	return 0;
 }
 
@@ -437,7 +443,13 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	}
 	//dont need remainder here
 	free(remainder.num);
-	quotient->negative = x->negative ^ y->negative;
+	//figure out the sign of the quotient
+	if (x->negative != 0 && y->negative != 0){
+		quotient->negative = 0;
+	}
+	else {
+		quotient->negative = x->negative ^ y->negative;
+	}
 	return 0;
 }
 
