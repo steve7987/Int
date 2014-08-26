@@ -202,6 +202,19 @@ int Compare(BigInt * x, BigInt * y){
 	return 0;
 }
 
+void AddS(BigInt * x, unsigned char y){
+	//check that x is positive, otherwise need to subtract
+	
+	//add y
+	int i = 0;
+	while (y != 0){
+		int result = x->num[i] + y;
+		x->num[i] = (unsigned char) result;
+		y = result >> (8 * sizeof(unsigned char));  //set y to be the carry
+		i++;
+	}
+}
+
 void SubtractS(BigInt * x, unsigned char y){
 	//check if x > y
 	
