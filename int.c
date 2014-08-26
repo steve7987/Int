@@ -203,8 +203,13 @@ int Compare(BigInt * x, BigInt * y){
 }
 
 void AddS(BigInt * x, unsigned char y){
-	//check that x is positive, otherwise need to subtract
-	
+	if (x->negative != 0){
+		//if x is negative do -(-x - y)
+		x->negative = 0;
+		SubtractS(x, y);
+		x->negative = 1;
+		return;
+	}
 	//add y
 	int i = 0;
 	while (y != 0){
@@ -216,8 +221,14 @@ void AddS(BigInt * x, unsigned char y){
 }
 
 void SubtractS(BigInt * x, unsigned char y){
-	//check if x > y
-	
+	if (x->negative != 0){
+		//if x is negative do -(-x + y)
+		x->negative = 0;
+		AddS(x, y);
+		x->negative = 1;
+		return;
+	}
+	//if x positive but smaller than y
 	
 	//subtract y
 	int i = 0;
