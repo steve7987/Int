@@ -5,9 +5,11 @@
 int SaveInt(char * filename, BigInt * tosave){
 	FILE * fp = fopen(filename, "wb");
 	int length = tosave->length;
+	/*  testing with leaving zeros included
 	while(tosave->num[length - 1] == 0){  //remove leading zeros
 		length--;
 	}
+	*/
 	if (length == 0){
 		length = 1;
 	}
@@ -130,7 +132,7 @@ int Compare(BigInt * x, BigInt * y){
 		}
 	}
 	else {
-		i = x->length;
+		i = x->length - 1;
 	}
 	for (; i >= 0; i--){
 		
@@ -265,7 +267,7 @@ int Add(BigInt * x, BigInt * y, BigInt * sum){
 }
 
 int Subtract(BigInt * x, BigInt * y, BigInt * difference){
-	//assuming both are positive
+	//if y is bigger, just swap the two
 	if (Compare(x, y) < 0){
 		BigInt * tmp = x;
 		x = y;
@@ -364,7 +366,6 @@ int DivideHelp(BigInt * x, BigInt * y){
 	}
 }
 
-//some problem when there are leading zeros in y
 int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	if (Compare(x, y) == 0){
 		//x and y are equal, quotient is 1
@@ -393,10 +394,14 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	BigInt remainder;
 	remainder.length = y->length + 1;
 	remainder.num = malloc(sizeof(unsigned char)*remainder.length);
+	if (!remainder.num){
+		printf("Malloc failed in division");
+		return 1;
+	}
 	quotient->length = x->length - y->length + 1;
 	quotient->num = malloc(sizeof(unsigned char)*quotient->length);
 	if (!quotient->num){
-		printf("Malloc division failed");
+		printf("Malloc failed in division");
 		return 1;
 	}
 	//set remainder and quotient to zero
