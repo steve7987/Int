@@ -15,12 +15,7 @@ int SaveInt(char * filename, BigInt * tosave){
 		printf("unable to open file %s", filename);
 		return 1;
 	}
-	//write the sign here
-	if (fwrite(&(tosave->negative), sizeof(unsigned char), 1, fp) != 1){
-		printf("Failed to write file %s", filename);
-		return 1;
-	}
-	//write the rest of the number
+	//write the number
 	if (fwrite(tosave->num, sizeof(unsigned char), length, fp) != length){
 		printf("Failed to write file %s", filename);
 		return 1;
@@ -37,7 +32,7 @@ int LoadInt(char * filename, BigInt * result){
 		return 1;
 	}
 	fseek(fp, 0, SEEK_END);
-	intlength = ftell(fp) - sizeof(unsigned char);  //exclude the sign character
+	intlength = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	result->num = malloc(sizeof(unsigned char) * ((intlength + sizeof(unsigned char) - 1) / sizeof(unsigned char)));
 	if (!result->num){
@@ -46,11 +41,6 @@ int LoadInt(char * filename, BigInt * result){
 	}
 	result->length = (intlength + sizeof(unsigned char) - 1) / sizeof(unsigned char);
 	result->num[result->length - 1] = 0;
-	//read sign
-	if (fread(&(result->negative), sizeof(unsigned char), 1, fp) != 1){
-		printf("Failed reading file %s", filename);
-		return 1;
-	}
 	//read digits
 	if (fread(result->num, 1, intlength, fp) != intlength){
 		printf("Failed reading file %s", filename);
@@ -61,20 +51,13 @@ int LoadInt(char * filename, BigInt * result){
 	return 0;
 }
 
-int MakeInt(int value, BigInt * result){
+int MakeInt(unsigned int value, BigInt * result){
 	int i;
 	result->length = sizeof(int) / sizeof(unsigned char);
 	result->num = malloc(sizeof(int));
 	if (!result->num){
 		printf("Malloc failed when making int with value %d", value);
 		return 1;
-	}
-	if (value < 0){
-		result->negative = 1;
-		value = value * -1;
-	}
-	else {
-		result->negative = 0;
 	}
 	for (i = 0; i < result->length; i++){
 		result->num[i] = (unsigned char) value;
@@ -94,7 +77,6 @@ int CopyInt(BigInt * source, BigInt * dest){
 	for (i = 0; i < source->length; i++){
 		dest->num[i] = source->num[i];
 	}
-	dest->negative = source->negative;
 	return 0;
 }
 
@@ -108,9 +90,6 @@ void DeleteInt(BigInt * deleteme){
 void PrintInt(BigInt * printme){
 	int i = printme->length - 1;
 	while (printme->num[i] == 0) i--;
-	if (printme->negative != 0 && i != -1){
-		printf("-");
-	}
 	
 	if (i == -1){
 		printf("0");
@@ -131,64 +110,23 @@ double Approximate(BigInt * x){
 		ret += x->num[i] * pow;
 		pow = pow * (1 << 8*sizeof(unsigned char));
 	}
-	if (x->negative != 0){
-		ret = ret * -1;
-	}
 	return ret;
 }
 
 int Compare(BigInt * x, BigInt * y){
-	int i, flag;  //flag flips return result if both numbers are negative
-	//check if number are different signs
-	if (x->negative == 0 && y->negative != 0){
-		//check if x is zero
-		for (i = 0; i < x->length; i++){
-			if (x->num[i] != 0){
-				return 1;
-			}
-		}
-		//check if y is zero
-		for (i = 0; i < y->length; i++){
-			if (y->num[i] != 0){
-				return -1;
-			}
-		}
-		return 0;
-	}
-	else if (x->negative != 0 && y->negative == 0){
-		//check if x is zero
-		for (i = 0; i < x->length; i++){
-			if (x->num[i] != 0){
-				return -1;
-			}
-		}
-		//check if y is zero
-		for (i = 0; i < y->length; i++){
-			if (y->num[i] != 0){
-				return 1;
-			}
-		}
-		return 0;
-	}
-	else if (x->negative == 0){
-		//both positive
-		flag = 1;
-	}
-	else {
-		flag = -1;
-	}
+	int i;
 	if (x->length > y->length){
 		//check if anything is non zero
 		for (i = x->length - 1; i >= (int) y->length; i--){
 			if(x->num[i] != 0){
-				return 1 * flag;
+				return 1;
 			}
 		}
 	}
 	else if (x->length < y->length){
 		//check if anything is non zero
 		for (i = y->length - 1; i >= x->length; i--){
-			if(y->num[i] != 0) return -1 * flag;
+			if(y->num[i] != 0) return -1;
 		}
 	}
 	else {
@@ -196,20 +134,13 @@ int Compare(BigInt * x, BigInt * y){
 	}
 	for (; i >= 0; i--){
 		
-		if (x->num[i] > y->num[i]) return 1 * flag;
-		if (x->num[i] < y->num[i]) return -1 * flag;
+		if (x->num[i] > y->num[i]) return 1;
+		if (x->num[i] < y->num[i]) return -1;
 	}
 	return 0;
 }
 
 void AddS(BigInt * x, unsigned char y){
-	if (x->negative != 0){
-		//if x is negative do -(-x - y)
-		x->negative = 0;
-		SubtractS(x, y);
-		x->negative = 1;
-		return;
-	}
 	//add y
 	int i = 0;
 	while (y != 0){
@@ -221,13 +152,6 @@ void AddS(BigInt * x, unsigned char y){
 }
 
 void SubtractS(BigInt * x, unsigned char y){
-	if (x->negative != 0){
-		//if x is negative do -(-x + y)
-		x->negative = 0;
-		AddS(x, y);
-		x->negative = 1;
-		return;
-	}
 	//if x positive but smaller than y
 	
 	//subtract y
@@ -296,14 +220,13 @@ void LeftShift(BigInt * x, unsigned int amt){
 }
 
 int Add(BigInt * x, BigInt * y, BigInt * sum){
-	//make y the smaller int based of length only
+	//make y the smaller int based on length only
 	if (y->length > x->length){
 		BigInt * tmp = x;
 		x = y;
 		y = tmp;
 	}
 	sum->length = x->length + 1;
-	sum->negative = 0;
 	sum->num = malloc(sum->length * sizeof(char));
 	if (!sum->num){
 		printf("Malloc failed when adding");
@@ -333,10 +256,7 @@ int Subtract(BigInt * x, BigInt * y, BigInt * difference){
 		BigInt * tmp = x;
 		x = y;
 		y = tmp;
-		difference->negative = 1;
-	}
-	else {
-		difference->negative = 0;
+
 	}
 	
 	//assume x >= y
@@ -400,13 +320,6 @@ int Multiply(BigInt * x, BigInt * y, BigInt * product){
 		product->num[i] = (unsigned char) sum;
 		carry = sum >> (8*sizeof(unsigned char));
 	}
-	//figure out the sign of the product
-	if (x->negative != 0 && y->negative != 0){
-		product->negative = 0;
-	}
-	else {
-		product->negative = x->negative ^ y->negative;
-	}
 	return 0;
 }
 
@@ -467,13 +380,6 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	}
 	//dont need remainder here
 	free(remainder.num);
-	//figure out the sign of the quotient
-	if (x->negative != 0 && y->negative != 0){
-		quotient->negative = 0;
-	}
-	else {
-		quotient->negative = x->negative ^ y->negative;
-	}
 	return 0;
 }
 
@@ -520,9 +426,6 @@ int PrintBase10(BigInt * x){
 	}
 	ret[index] = '\0';
 	DeleteInt(&p);
-	if (x->negative != 0){
-		printf("-");
-	}
 	printf(ret);
 	printf("\n");
 	free(ret);
@@ -534,14 +437,6 @@ char * ToBase10(BigInt * x){
 	int rlength;
 	int index;
 	BigInt p, zero;
-	int offset;
-	if (x->negative != 0){  //need extra char for negative number
-		offset = 1;
-	}
-	else {
-		offset = 0;
-	}
-
 	CopyInt(x, &p);
 	zero.length = 0;
 	ret = malloc(x->length*sizeof(char));  //can expand if necessary
@@ -556,7 +451,7 @@ char * ToBase10(BigInt * x){
 		DivideS(&p, 10);
 		index++;
 		//if out of space make array bigger
-		if (index + offset >= rlength){
+		if (index >= rlength){
 			int i;
 			char * tmp = malloc(2*rlength*sizeof(char));
 			if (!tmp){
@@ -570,10 +465,6 @@ char * ToBase10(BigInt * x){
 			ret = tmp;
 			rlength = 2*rlength;
 		}
-	}
-	if (offset != 0){
-		ret[index] = '-';
-		index++;
 	}
 	//reverse array
 	int i;
