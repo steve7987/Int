@@ -15,7 +15,7 @@ void DeleteInt(BigInt * deleteme);  //frees the data of the int
 void PrintInt(BigInt * printme);  //prints the int in hexadecimal
 int Compare(BigInt * x, BigInt * y);  //returns 1 if x > y, 0 if x == y, -1 if x < y
 double Approximate(BigInt * x);  //gives the double approximation of this int
-
+int RandomInt(size_t length, BigInt * result);  //returns a random number of the given length, does not set a seed, set the seed before calling
 
 //these functions perform arithmetic where one input is small
 //in general they will modify the input big int (except modulo)

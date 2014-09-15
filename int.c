@@ -140,6 +140,20 @@ int Compare(BigInt * x, BigInt * y){
 	return 0;
 }
 
+int RandomInt(size_t length, BigInt * result){
+	int i;
+	result->length = length;
+	result->num = malloc(sizeof(unsigned char) * length);
+	if (!result->num){
+		printf("Malloc failed when making a random int");
+		return 1;
+	}
+	for (i = 0; i < result->length; i++){
+		result->num[i] = (unsigned char) rand();
+	}
+	return 0;
+}
+
 void AddS(BigInt * x, unsigned char y){
 	//add y
 	int i = 0;
@@ -350,6 +364,7 @@ int DivideHelp(BigInt * x, BigInt * y){
 	}
 }
 
+//some problem when there are leading zeros in y
 int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	//proceed assuming y smaller than x
 	BigInt remainder;
