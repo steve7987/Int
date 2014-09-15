@@ -366,6 +366,29 @@ int DivideHelp(BigInt * x, BigInt * y){
 
 //some problem when there are leading zeros in y
 int Divide(BigInt * x, BigInt * y, BigInt * quotient){
+	if (Compare(x, y) == 0){
+		//x and y are equal, quotient is 1
+		quotient->length = 1;
+		quotient->num = malloc(sizeof(unsigned char));
+		if (!quotient->num){
+			printf("Malloc failed in division");
+			return 1;
+		}
+		quotient->num[0] = 1;
+		return 0;
+	}
+	else if (Compare(x, y) < 0){
+		//y is bigger, quotient is 0
+		quotient->length = 1;
+		quotient->num = malloc(sizeof(unsigned char));
+		if (!quotient->num){
+			printf("Malloc failed in division");
+			return 1;
+		}
+		quotient->num[0] = 0;
+		return 0;
+	}
+	
 	//proceed assuming y smaller than x
 	BigInt remainder;
 	remainder.length = y->length + 1;
