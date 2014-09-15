@@ -3,14 +3,13 @@ typedef struct
 {
 	size_t length;  
 	unsigned char * num;
-	unsigned char negative;  //0 is positive, non 0 is negative
 } BigInt;
 
 //in general these functions return 1 if the function failed, and 0 if it succeeded
 //when saving and loading sign is stored in the first byte then the least significant byte is stored first
 int LoadInt(char * filename, BigInt * result);  //loads a big int from a file into memory
 int SaveInt(char * filename, BigInt * tosave);  //saves a big int to a file
-int MakeInt(int value, BigInt * result);  //creates a big int with the value of the given int
+int MakeInt(unsigned int value, BigInt * result);  //creates a big int with the value of the given int
 int CopyInt(BigInt * source, BigInt * dest);  //makes a deep copy of the source
 void DeleteInt(BigInt * deleteme);  //frees the data of the int
 void PrintInt(BigInt * printme);  //prints the int in hexadecimal
@@ -33,7 +32,7 @@ void LeftShift(BigInt * x, unsigned int amt);  //left shifts x by amt bits (exce
 //they should not modify either input
 //in general they return 1 if the function failed, and 0 if it succeeded
 int Add(BigInt * x, BigInt * y, BigInt * sum);
-int Subtract(BigInt * x, BigInt * y, BigInt * difference);
+int Subtract(BigInt * x, BigInt * y, BigInt * difference);  //gives absolute value of the difference
 int Multiply(BigInt * x, BigInt * y, BigInt * product);
 int Divide(BigInt * x, BigInt * y, BigInt * quotient);
 int Modulo(BigInt * x, BigInt * y, BigInt * remainder);
