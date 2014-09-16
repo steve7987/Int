@@ -5,11 +5,9 @@
 int SaveInt(char * filename, BigInt * tosave){
 	FILE * fp = fopen(filename, "wb");
 	int length = tosave->length;
-	/*  testing with leaving zeros included
-	while(tosave->num[length - 1] == 0){  //remove leading zeros
+	while(length > 0 && tosave->num[length - 1] == 0){  //remove leading zeros
 		length--;
 	}
-	*/
 	if (length == 0){
 		length = 1;
 	}
@@ -392,20 +390,25 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	
 	//proceed assuming y smaller than x
 	BigInt remainder;
-	remainder.length = y->length + 1;
+	remainder.length = y->length + 1;  //even though remainder cannot be bigger than y it may be bigger during the calculations
 	remainder.num = malloc(sizeof(unsigned char)*remainder.length);
 	if (!remainder.num){
 		printf("Malloc failed in division");
 		return 1;
 	}
-	quotient->length = x->length - y->length + 1;
+	int i;
+	//find length of y excluding leading zeros
+	int nonZeroYLength = y->length;
+	while(nonZeroYLength > 0 && y->num[nonZeroYLength - 1] == 0){
+		nonZeroYLength--;
+	}
+	quotient->length = x->length - nonZeroYLength + 1;  //max possible length of quotient
 	quotient->num = malloc(sizeof(unsigned char)*quotient->length);
 	if (!quotient->num){
 		printf("Malloc failed in division");
 		return 1;
 	}
 	//set remainder and quotient to zero
-	int i;
 	for (i = 0; i < remainder.length; i++){
 		remainder.num[i] = 0;
 	}
@@ -415,8 +418,10 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	//follow algorithm for binary division
 	for (i = x->length*sizeof(unsigned char)*8 - 1; i >= 0; i--){
 		LeftShift(&remainder, 1);
-		remainder.num[0] = remainder.num[0] | (x->num[i / (8*sizeof(unsigned char))] >> (i%(8*sizeof(unsigned char))));
+		//remainder reads in the dividend bit by bit
+		remainder.num[0] = remainder.num[0] | ((x->num[i / (8*sizeof(unsigned char))] >> (i%(8*sizeof(unsigned char)))) & 1);
 		if (Compare(&remainder, y) >= 0){
+			//when possible subtract divisor from the read in part of the dividend, then update the quotient
 			DivideHelp(&remainder, y);
 			quotient->num[i / (8*sizeof(unsigned char))] = quotient->num[i / (8*sizeof(unsigned char))] | (1 << (i%(8*sizeof(unsigned char))));
 		}
