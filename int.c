@@ -432,7 +432,66 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	return 0;
 }
 
-
+int Modulo(BigInt * x, BigInt * y, BigInt * remainder){
+	int comp = Compare(x, y);
+	if (comp == 0){
+		//x and y are equal, remainder is 0
+		remainder->length = 1;
+		remainder->num = malloc(sizeof(unsigned char));
+		if (!remainder->num){
+			printf("Malloc failed in division");
+			return 1;
+		}
+		remainder->num[0] = 0;
+		return 0;
+	}
+	else if (comp < 0){
+		//y is bigger, remainder is same as x
+		return CopyInt(x, remainder);
+	}
+	
+	//proceed knowing that y is smaller than x
+	BigInt quotient;
+	remainder->length = y->length + 1;  //even though remainder cannot be bigger than y it may be bigger during the calculations
+	remainder->num = malloc(sizeof(unsigned char)*remainder->length);
+	if (!remainder->num){
+		printf("Malloc failed in division");
+		return 1;
+	}
+	int i;
+	//find length of y excluding leading zeros
+	int nonZeroYLength = y->length;
+	while(nonZeroYLength > 0 && y->num[nonZeroYLength - 1] == 0){
+		nonZeroYLength--;
+	}
+	quotient.length = x->length - nonZeroYLength + 1;  //max possible length of quotient
+	quotient.num = malloc(sizeof(unsigned char)*quotient.length);
+	if (!quotient.num){
+		printf("Malloc failed in division");
+		return 1;
+	}
+	//set remainder and quotient to zero
+	for (i = 0; i < remainder->length; i++){
+		remainder->num[i] = 0;
+	}
+	for (i = 0; i < quotient.length; i++){
+		quotient.num[i] = 0;
+	}
+	//follow algorithm for binary division
+	for (i = x->length*sizeof(unsigned char)*8 - 1; i >= 0; i--){
+		LeftShift(remainder, 1);
+		//remainder reads in the dividend bit by bit
+		remainder->num[0] = remainder->num[0] | ((x->num[i / (8*sizeof(unsigned char))] >> (i%(8*sizeof(unsigned char)))) & 1);
+		if (Compare(remainder, y) >= 0){
+			//when possible subtract divisor from the read in part of the dividend, then update the quotient
+			DivideHelp(remainder, y);
+			quotient.num[i / (8*sizeof(unsigned char))] = quotient.num[i / (8*sizeof(unsigned char))] | (1 << (i%(8*sizeof(unsigned char))));
+		}
+	}
+	//dont need quotient here
+	free(quotient.num);
+	return 0;
+}
 
 int PrintBase10(BigInt * x){
 	char * ret;
