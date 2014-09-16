@@ -365,7 +365,8 @@ int DivideHelp(BigInt * x, BigInt * y){
 }
 
 int Divide(BigInt * x, BigInt * y, BigInt * quotient){
-	if (Compare(x, y) == 0){
+	int comp = Compare(x, y);
+	if (comp == 0){
 		//x and y are equal, quotient is 1
 		quotient->length = 1;
 		quotient->num = malloc(sizeof(unsigned char));
@@ -376,7 +377,7 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 		quotient->num[0] = 1;
 		return 0;
 	}
-	else if (Compare(x, y) < 0){
+	else if (comp < 0){
 		//y is bigger, quotient is 0
 		quotient->length = 1;
 		quotient->num = malloc(sizeof(unsigned char));
@@ -388,7 +389,7 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 		return 0;
 	}
 	
-	//proceed assuming y smaller than x
+	//proceed knowing that y is smaller than x
 	BigInt remainder;
 	remainder.length = y->length + 1;  //even though remainder cannot be bigger than y it may be bigger during the calculations
 	remainder.num = malloc(sizeof(unsigned char)*remainder.length);
@@ -430,6 +431,8 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	free(remainder.num);
 	return 0;
 }
+
+
 
 int PrintBase10(BigInt * x){
 	char * ret;
