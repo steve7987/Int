@@ -392,9 +392,9 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 	//proceed knowing that y is smaller than x
 	BigInt remainder;
 	remainder.length = y->length + 1;  //even though remainder cannot be bigger than y it may be bigger during the calculations
-	remainder.num = malloc(sizeof(unsigned char)*remainder.length);
+	remainder.num = calloc(remainder.length, sizeof(unsigned char));
 	if (!remainder.num){
-		printf("Malloc failed in division");
+		printf("Calloc failed in division");
 		return 1;
 	}
 	int i;
@@ -404,17 +404,10 @@ int Divide(BigInt * x, BigInt * y, BigInt * quotient){
 		nonZeroYLength--;
 	}
 	quotient->length = x->length - nonZeroYLength + 1;  //max possible length of quotient
-	quotient->num = malloc(sizeof(unsigned char)*quotient->length);
+	quotient->num = calloc(quotient->length, sizeof(unsigned char));
 	if (!quotient->num){
-		printf("Malloc failed in division");
+		printf("Calloc failed in division");
 		return 1;
-	}
-	//set remainder and quotient to zero
-	for (i = 0; i < remainder.length; i++){
-		remainder.num[i] = 0;
-	}
-	for (i = 0; i < quotient->length; i++){
-		quotient->num[i] = 0;
 	}
 	//follow algorithm for binary division
 	for (i = x->length*sizeof(unsigned char)*8 - 1; i >= 0; i--){
@@ -453,9 +446,9 @@ int Modulo(BigInt * x, BigInt * y, BigInt * remainder){
 	//proceed knowing that y is smaller than x
 	BigInt quotient;
 	remainder->length = y->length + 1;  //even though remainder cannot be bigger than y it may be bigger during the calculations
-	remainder->num = malloc(sizeof(unsigned char)*remainder->length);
+	remainder->num = calloc(remainder->length, sizeof(unsigned char));
 	if (!remainder->num){
-		printf("Malloc failed in division");
+		printf("Calloc failed in modulo");
 		return 1;
 	}
 	int i;
@@ -465,18 +458,20 @@ int Modulo(BigInt * x, BigInt * y, BigInt * remainder){
 		nonZeroYLength--;
 	}
 	quotient.length = x->length - nonZeroYLength + 1;  //max possible length of quotient
-	quotient.num = malloc(sizeof(unsigned char)*quotient.length);
+	quotient.num = calloc(quotient.length, sizeof(unsigned char));
 	if (!quotient.num){
-		printf("Malloc failed in division");
+		printf("Calloc failed in modulo");
 		return 1;
 	}
 	//set remainder and quotient to zero
+	/*
 	for (i = 0; i < remainder->length; i++){
 		remainder->num[i] = 0;
 	}
 	for (i = 0; i < quotient.length; i++){
 		quotient.num[i] = 0;
 	}
+	*/
 	//follow algorithm for binary division
 	for (i = x->length*sizeof(unsigned char)*8 - 1; i >= 0; i--){
 		LeftShift(remainder, 1);
